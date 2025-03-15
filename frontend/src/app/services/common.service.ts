@@ -20,10 +20,7 @@ export abstract class CommonService<E extends Generic> {
     }
 
     public getAllPages(page: string, size: string): Observable<any> {
-      const params = new HttpParams()
-        .set('page', page)
-        .set('size', size)
-      return this.http.get<any>(`${this.baseEnpoint}/page/${page}/${size}`, { params: params });
+     return this.http.get<any>(`${this.baseEnpoint}/page/${page}/${size}`);
     }
     
     public getAllPagesWithText(page: string, size: string, text: string): Observable<any> {

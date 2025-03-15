@@ -15,13 +15,13 @@ import { StudentFormComponent } from "../create/student-form.component";
 import { ConfirmDialogComponent } from "../../../shared/confirm-dialog/confirm-dialog.component";
 import { environment } from "src/environments/environment";
 import { AppSettings } from "src/app/config/app";
+
 @Component({
   selector: "app-students",
   templateUrl: "./students.component.html",
   styleUrls: ["./students.component.css"],
 })
 export class StudentsComponent implements OnInit, AfterViewInit {
-  dialogRef: MatDialog;
   title = "Students list";
   dataList: Student[] = [];
   totalElements: number = 0;
@@ -37,9 +37,10 @@ export class StudentsComponent implements OnInit, AfterViewInit {
     "email",
     "image"
   ];
-  dataSource = new MatTableDataSource();
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  dataSource = new MatTableDataSource<Student>();
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private service: StudentService,
@@ -61,24 +62,23 @@ export class StudentsComponent implements OnInit, AfterViewInit {
     this.getDataPageWithText(
       this.pageIndex,
       this.pageSize,
-      filterValue.trim().toLowerCase().toString()
+      filterValue.trim().toLowerCase()
     );
   }
-
-  openDialog(student): void {
-    const dialogRef = this._dialog.open(StudentFormComponent, {
-      width: "640px",
-      disableClose: true,
-      data: student,
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if(result.data?.id > 0){
-        this.getDataPage(this.pageIndex, this.pageSize);
-      }
-    });
-  }
-
-  detectChanges(){
+openDialog(student: Student | null): void {
+  const dialogRef = this._dialog.open(StudentFormComponent, {
+    width: "640px",
+    disableClose: true,
+    data: student,
+  });
+  dialogRef.afterClosed().subscribe((result) => {
+    if (result?.data?.id > 0) {
+      this.getDataPage(this.pageIndex, this.pageSize);
+    }
+    (document.querySelector('button.action') as HTMLElement)?.focus(); // Remet le focus sur "New Student"
+  });
+}
+  detectChanges() {
     this.changeDetectorRefs.detectChanges();
   }
 
@@ -98,9 +98,11 @@ export class StudentsComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
-        this.service.delete(id).subscribe((data) => {
-                this.getDataPage(this.pageIndex, this.pageSize);
-          },(error) => {
+        this.service.delete(id).subscribe(
+          () => {
+            this.getDataPage(this.pageIndex, this.pageSize);
+          },
+          (error) => {
             console.log(error.error.message);
           }
         );
@@ -111,11 +113,11 @@ export class StudentsComponent implements OnInit, AfterViewInit {
   nextPage(event: PageEvent) {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-    this.getDataPage(this.pageIndex.toString(), this.pageSize.toString());
+    this.getDataPage(this.pageIndex, this.pageSize);
   }
 
-  getDataPage(page, size) {
-    this.service.getAllPages(page, size).subscribe(
+  getDataPage(page: number, size: number) {
+    this.service.getAllPages(page.toString(), size.toString()).subscribe(
       (data) => {
         this.manageResponsePages(data);
       },
@@ -125,8 +127,8 @@ export class StudentsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  getDataPageWithText(page, size, text) {
-    this.service.getAllPagesWithText(page, size, text).subscribe(
+  getDataPageWithText(page: number, size: number, text: string) {
+    this.service.getAllPagesWithText(page.toString(), size.toString(), text).subscribe(
       (data) => {
         this.manageResponsePages(data);
       },
@@ -136,7 +138,7 @@ export class StudentsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  manageResponsePages(data) {
+  manageResponsePages(data: any) {
     this.dataSource = new MatTableDataSource(data["content"]);
     this.dataList = data["content"];
     this.totalElements = data["totalElements"] as number;

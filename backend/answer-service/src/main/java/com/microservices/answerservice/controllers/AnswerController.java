@@ -24,10 +24,12 @@ public class AnswerController {
     private AnswerService service;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Iterable<Answer> answers){
-        answers = ((List<Answer>)answers).stream().map(r -> {
-            r.setStudentId(r.getStudent().getId());
-            r.setQuestionId(r.getQuestion().getId());
+    public ResponseEntity<?> create(@RequestBody Iterable<Answer> answers) {
+        // Extrayez les IDs et, si possible, l'examId (doit être fourni dans la requête)
+        answers = ((List<Answer>) answers).stream().map(r -> {
+            if (r.getStudent() != null) r.setStudentId(r.getStudent().getId());
+            if (r.getQuestion() != null) r.setQuestionId(r.getQuestion().getId());
+            // Ajoutez une logique pour définir examId si nécessaire (par exemple, via un appel Feign)
             return r;
         }).collect(Collectors.toList());
         Iterable<Answer> answersBD = service.saveAll(answers);
@@ -45,5 +47,4 @@ public class AnswerController {
         Iterable<Long> examsIds = service.findExamsIdByWithAnswersByStudent(studentId);
         return ResponseEntity.ok(examsIds);
     }
-
 }

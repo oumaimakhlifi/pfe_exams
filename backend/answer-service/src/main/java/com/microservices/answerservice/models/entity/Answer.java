@@ -1,8 +1,7 @@
 package com.microservices.answerservice.models.entity;
 
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.microservices.commonexam.models.entity.Question;
@@ -21,13 +20,15 @@ public class Answer {
 
     private String text;
 
-   // @Transient
+    @Transient
     private Student student;
 
     private Long studentId;
 
-    //@Transient
+    @Transient
     private Question question;
 
     private Long questionId;
+
+    private Long examId; // Ajouter ce champ
 }

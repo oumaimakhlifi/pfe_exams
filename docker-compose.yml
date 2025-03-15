@@ -1,0 +1,204 @@
+version: '3.8'
+
+services:
+  # Service de découverte (Eureka)
+  eureka-service:
+    build:
+      context: ./backend/eureka-service
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - SPRING_APPLICATION_NAME=eureka-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - microservices-network
+
+  # API Gateway (Zuul)
+  zuul-service:
+    build:
+      context: ./backend/zuul-service
+    ports:
+      - "8090:8090"
+    environment:
+      - SERVER_PORT=8090
+      - SPRING_APPLICATION_NAME=zuul-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=true
+      - EUREKA_CLIENT_FETCH-REGISTRY=true
+      - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+    depends_on:
+      - eureka-service
+      - user-service
+      - course-service
+      - exam-service
+      - answer-service
+    command: ["sh", "-c", "sleep 60 && java -jar /app/zuul-service.jar"]  # Délai de 60 secondes
+    networks:
+      - microservices-network
+
+  # Microservice Users (PostgreSQL)
+  user-service:
+    build:
+      context: ./backend/user-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_APPLICATION_NAME=users-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=true
+      - EUREKA_CLIENT_FETCH-REGISTRY=true
+      - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+      - EUREKA_INSTANCE_APPNAME=users-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/microservices_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - eureka-service
+      - postgres
+    networks:
+      - microservices-network
+
+  # Microservice Courses (MySQL)
+  course-service:
+    build:
+      context: ./backend/course-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_APPLICATION_NAME=courses-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=true
+      - EUREKA_CLIENT_FETCH-REGISTRY=true
+      - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+      - EUREKA_INSTANCE_APPNAME=courses-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/microservices_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - eureka-service
+      - mysql
+    networks:
+      - microservices-network
+
+  # Microservice Exams (MySQL)
+  exam-service:
+    build:
+      context: ./backend/exam-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_APPLICATION_NAME=exams-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=true
+      - EUREKA_CLIENT_FETCH-REGISTRY=true
+      - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+      - EUREKA_INSTANCE_APPNAME=exams-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/microservices_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - eureka-service
+      - mysql
+    networks:
+      - microservices-network
+
+  # Microservice Answers (MongoDB)
+  answer-service:
+    build:
+      context: ./backend/answer-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+      - SPRING_APPLICATION_NAME=answers-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - EUREKA_CLIENT_REGISTER-WITH-EUREKA=true
+      - EUREKA_CLIENT_FETCH-REGISTRY=true
+      - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+      - EUREKA_INSTANCE_APPNAME=answers-service
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/microservices_db
+    depends_on:
+      - eureka-service
+      - mongo
+    networks:
+      - microservices-network
+
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=microservices_db
+    volumes:
+      - ./microservices_db_postgres.sql:/docker-entrypoint-initdb.d/microservices_db_postgres.sql
+    networks:
+      - microservices-network
+
+  # Base de données MySQL
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=microservices_db
+    volumes:
+      - ./microservices_db_mysql.sql:/docker-entrypoint-initdb.d/microservices_db_mysql.sql
+    networks:
+      - microservices-network
+
+  # Base de données MongoDB
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=microservices_db
+    # volumes:
+    #   - ./microservices_db_mongo.js:/docker-entrypoint-initdb.d/microservices_db_mongo.js  # Désactivé pour éviter les erreurs
+    networks:
+      - microservices-network
+
+  # Interface Angular (optionnel)
+  angular-app:
+    build:
+      context: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - zuul-service
+    networks:
+      - microservices-network
+
+  # Conteneur de test
+  test-container:
+    image: alpine:latest
+    entrypoint: ["/bin/sh", "-c", "sleep infinity"]
+    depends_on:
+      - eureka-service
+      - postgres
+      - mysql
+      - mongo
+      - user-service
+      - course-service
+      - exam-service
+      - answer-service
+      - zuul-service
+    command: >
+      sh -c "apk add curl && apk add mongodb-tools && tail -f /dev/null"
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
