@@ -33,7 +33,7 @@ services:
       - course-service
       - exam-service
       - answer-service
-    command: ["sh", "-c", "sleep 60 && java -jar /app/zuul-service.jar"]  # Délai de 60 secondes
+    command: ["sh", "-c", "sleep 60 && java -jar /app/zuul-service.jar"]
     networks:
       - microservices-network
 
@@ -141,6 +141,7 @@ services:
       - POSTGRES_DB=microservices_db
     volumes:
       - ./microservices_db_postgres.sql:/docker-entrypoint-initdb.d/microservices_db_postgres.sql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - microservices-network
 
@@ -154,6 +155,7 @@ services:
       - MYSQL_DATABASE=microservices_db
     volumes:
       - ./microservices_db_mysql.sql:/docker-entrypoint-initdb.d/microservices_db_mysql.sql
+      - mysql_data:/var/lib/mysql
     networks:
       - microservices-network
 
@@ -164,8 +166,9 @@ services:
       - "27017:27017"
     environment:
       - MONGO_INITDB_DATABASE=microservices_db
-    # volumes:
-    #   - ./microservices_db_mongo.js:/docker-entrypoint-initdb.d/microservices_db_mongo.js  # Désactivé pour éviter les erreurs
+    volumes:
+      - ./microservices_db_mongo.js:/docker-entrypoint-initdb.d/microservices_db_mongo.js
+      - mongo_data:/data/db
     networks:
       - microservices-network
 
@@ -202,3 +205,8 @@ services:
 networks:
   microservices-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  mysql_data:
+  mongo_data:
