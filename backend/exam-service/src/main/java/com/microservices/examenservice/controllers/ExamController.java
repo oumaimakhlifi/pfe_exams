@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +25,7 @@ import com.microservices.commonservice.controller.CommonController;
 import com.microservices.examenservice.services.ExamService;
 
 @RequestMapping("exams")
+@CrossOrigin(origins = "http://192.168.56.55:4200")
 @RestController
 public class ExamController extends CommonController<Exam, ExamService> {
 
