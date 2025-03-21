@@ -9,10 +9,10 @@ import { Answer } from '../../models/Answer';
 })
 export class AnswerManagementComponent implements OnInit {
   answers: Answer[] = [];
-  studentIdFilter: number | undefined;
-  examIdFilter: number | undefined;
+  studentIdFilter?: number;
+  examIdFilter?: number;
   showModal: boolean = false;
-  selectedAnswer: Answer = { id: '', text: '', student: null, question: null, studentId: null, questionId: null, examId: null };
+  selectedAnswer: Answer = { id: '', text: '', studentId: null, questionId: null, examId: null };
   isEditMode: boolean = false;
   message: string = '';
 
@@ -28,12 +28,12 @@ export class AnswerManagementComponent implements OnInit {
   loadAllAnswers() {
     this.answerService.getAllAnswers().subscribe({
       next: (data) => {
-        this.answers = data || []; // Assure que answers est toujours un tableau
+        this.answers = data || [];
+        this.cdr.detectChanges(); // Force la mise à jour de l'affichage
         this.message = this.answers.length > 0 ? `${this.answers.length} réponse(s) chargée(s).` : 'Aucune réponse disponible.';
-        this.cdr.detectChanges(); // Force Angular à mettre à jour l’affichage
       },
       error: (err) => {
-        this.message = `Erreur lors du chargement des réponses : ${err.message}`;
+        this.message = `Erreur : ${err.message}`;
         this.answers = [];
         this.cdr.detectChanges();
       }
@@ -41,26 +41,26 @@ export class AnswerManagementComponent implements OnInit {
   }
 
   searchAnswers() {
-    if (this.studentIdFilter !== undefined && this.examIdFilter !== undefined) {
+    if (this.studentIdFilter && this.examIdFilter) {
       this.answerService.getAnswersByStudentAndExam(this.studentIdFilter, this.examIdFilter).subscribe({
         next: (data) => {
           this.answers = data || [];
-          this.message = data.length > 0 ? `${data.length} réponse(s) trouvée(s).` : 'Aucune réponse trouvée pour ces filtres.';
           this.cdr.detectChanges();
+          this.message = data.length > 0 ? `${data.length} réponse(s) trouvée(s).` : 'Aucune réponse trouvée.';
         },
         error: (err) => {
-          this.message = `Erreur lors de la recherche : ${err.message}`;
-          this.loadAllAnswers(); // Revient à toutes les réponses en cas d’erreur
+          this.message = `Erreur : ${err.message}`;
+          this.loadAllAnswers();
         }
       });
     } else {
-      this.message = 'Veuillez entrer un ID étudiant et un ID examen pour filtrer.';
-      this.loadAllAnswers(); // Recharge toutes les réponses si les filtres sont incomplets
+      this.message = 'Veuillez entrer un ID étudiant et un ID examen.';
+      this.loadAllAnswers();
     }
   }
 
   openAddModal() {
-    this.selectedAnswer = { id: '', text: '', student: null, question: null, studentId: null, questionId: null, examId: null };
+    this.selectedAnswer = { id: '', text: '', studentId: null, questionId: null, examId: null };
     this.isEditMode = false;
     this.showModal = true;
   }

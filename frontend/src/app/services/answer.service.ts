@@ -7,7 +7,7 @@ import { Answer } from '../models/Answer';
   providedIn: 'root'
 })
 export class AnswerService {
-  private apiUrl = 'http://192.168.56.55:8090/answers'; // Via Zuul
+  private apiUrl = 'http://192.168.56.55:8090/answers'; // URL du backend via Zuul
 
   constructor(private http: HttpClient) {}
 
@@ -22,8 +22,8 @@ export class AnswerService {
   createAnswers(answers: Answer[]): Observable<Answer[]> {
     const payload = answers.map(a => ({
       text: a.text,
-      studentId: a.studentId || a.student?.id,
-      questionId: a.questionId || a.question?.id,
+      studentId: a.studentId,
+      questionId: a.questionId,
       examId: a.examId
     }));
     return this.http.post<Answer[]>(this.apiUrl, payload);
@@ -32,8 +32,8 @@ export class AnswerService {
   updateAnswer(id: string, answer: Answer): Observable<Answer> {
     const payload = {
       text: answer.text,
-      studentId: answer.studentId || answer.student?.id,
-      questionId: answer.questionId || answer.question?.id,
+      studentId: answer.studentId,
+      questionId: answer.questionId,
       examId: answer.examId
     };
     return this.http.put<Answer>(`${this.apiUrl}/${id}`, payload);

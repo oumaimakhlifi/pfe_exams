@@ -1,52 +1,11 @@
 .container {
-  max-width: 1000px;
-  margin: 0 auto;
   padding: 20px;
-  background: #fff;
-  border: 1px solid #ddd;
-}
-
-h2 {
-  color: #003087;
-  font-size: 24px;
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 .filters {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   margin-bottom: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-group input, .form-group textarea {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.filters button, .add {
-  padding: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.add {
-  background: #28a745;
-  margin-top: 20px;
 }
 
 table {
@@ -56,36 +15,64 @@ table {
 
 th, td {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   text-align: left;
 }
 
 th {
-  background: #f1f1f1;
-  font-weight: bold;
+  background-color: #f4f4f4;
 }
 
-tr:nth-child(even) {
-  background: #f9f9f9;
-}
-
-.edit {
-  background: #007bff;
-  color: white;
+/* Style de base pour tous les boutons */
+button {
+  padding: 8px 12px;
+  cursor: pointer;
   border: none;
-  padding: 5px;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+}
+
+/* Bouton "Rechercher" dans .filters */
+.filters button {
+  background-color: #FF9800; /* Orange */
+}
+
+.filters button:hover {
+  background-color: #F57C00; /* Orange plus foncé au survol */
+}
+
+/* Bouton "Ajouter une réponse" */
+button.add {
+  background-color: #2196F3; /* Bleu */
+  padding: 10px 15px;
+  margin-top: 10px;
+}
+
+button.add:hover {
+  background-color: #1976D2; /* Bleu plus foncé au survol */
+}
+
+/* Bouton "Modifier" (✏️) */
+button.edit {
+  background-color: #4CAF50; /* Vert */
   margin-right: 5px;
-  cursor: pointer;
 }
 
-.delete {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
+button.edit:hover {
+  background-color: #45a049; /* Vert plus foncé au survol */
 }
 
+/* Bouton "Supprimer" (🗑️) */
+button.delete {
+  background-color: #f44336; /* Rouge */
+}
+
+button.delete:hover {
+  background-color: #da190b; /* Rouge plus foncé au survol */
+}
+
+/* Styles pour la modale */
 .modal {
   position: fixed;
   top: 0;
@@ -99,42 +86,56 @@ tr:nth-child(even) {
 }
 
 .modal-content {
-  background: #fff;
+  background: white;
   padding: 20px;
   border-radius: 5px;
-  width: 500px;
+  width: 400px;
 }
 
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Boutons dans la modale */
 .modal-buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
-.cancel {
-  background: #6c757d;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+button.cancel {
+  background-color: #9E9E9E; /* Gris intentionnel pour "Annuler" */
 }
 
-.save {
-  background: #28a745;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+button.cancel:hover {
+  background-color: #757575; /* Gris plus foncé au survol */
 }
 
-.success {
-  color: #28a745;
-  margin-top: 10px;
+button.save {
+  background-color: #2196F3; /* Bleu */
 }
 
-.error {
-  color: #dc3545;
-  margin-top: 10px;
+button.save:hover {
+  background-color: #1976D2; /* Bleu plus foncé au survol */
+}
+
+/* Styles pour les messages */
+p.success {
+  color: #4CAF50; /* Vert pour succès */
+}
+
+p.error {
+  color: #f44336; /* Rouge pour erreur */
 }
