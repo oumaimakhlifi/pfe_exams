@@ -2,7 +2,6 @@ package com.microservices.answerservice.models.repository;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-
 import com.microservices.answerservice.models.entity.Answer;
 
 public interface AnswerRepository extends MongoRepository<Answer, String> {

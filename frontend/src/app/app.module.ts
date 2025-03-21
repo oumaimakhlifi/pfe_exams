@@ -51,6 +51,7 @@ import { CoursesComponent } from './components/courses/list/courses.component';
 import { CourseFormComponent } from './components/courses/create/course-form.component';
 import { ExamsComponent } from './components/exams/list/exams.component';
 import { ExamFormComponent } from './components/exams/create/exam-form.component';
+import { AnswerManagementComponent } from './components/answer-management/answer-management.component';
 
 const routes: Routes = [
   {
@@ -70,6 +71,7 @@ const routes: Routes = [
       { path: 'exams', component: ExamsComponent },
       { path: 'exams/:id', component: ExamFormComponent },
       { path: 'sales', component: SalesComponent },
+      { path: 'answers', component: AnswerManagementComponent },
     ],
   },
 ];
@@ -130,6 +132,7 @@ const routes: Routes = [
     ExamFormComponent,
     ExamsComponent,
     ConfirmDialogComponent,
+    AnswerManagementComponent,
   ],
   bootstrap: [AppComponent],
   providers: [{ provide: APP_BASE_HREF, useValue: '' }],

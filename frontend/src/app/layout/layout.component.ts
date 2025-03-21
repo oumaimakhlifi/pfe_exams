@@ -63,10 +63,14 @@ export class LayoutComponent {
           icon: 'dataset',
           color: '#ff7f0e',
           link: '/exams'
+        },
+        {
+          title: 'Answers',           // Nouvelle entrée ajoutée
+          icon: 'question_answer',    // Icône Material suggérée
+          link: '/answers',           // Doit correspondre à la route dans app.module.ts
+          color: '#ff7f0e'
         }
       ]
     }
   ];
 }
-
-
